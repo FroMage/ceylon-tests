@@ -1,23 +1,30 @@
-import ceylon.io.buffer { Buffer }
-import ceylon.io.buffer.impl { ByteBufferImpl }
 import ceylon.io { Socket }
+import ceylon.io.buffer { ByteBuffer }
+import ceylon.io.buffer.impl { ByteBufferImpl }
 
 import java.nio.channels { SocketChannel }
 
-shared class SocketImpl(SocketChannel channel) extends Socket() {
+shared class SocketImpl(channel) extends Socket() {
+    
+    shared SocketChannel channel;
+    
     shared actual void close() {
         channel.close();
     }
-    shared actual Integer read(Buffer buffer) {
+    shared actual Integer read(ByteBuffer buffer) {
         if(is ByteBufferImpl buffer){
-            return channel.read(buffer.buf);
+            return channel.read(buffer.underlyingBuffer);
         }
         throw;
     }
-    shared actual Integer write(Buffer buffer) {
+    shared actual Integer write(ByteBuffer buffer) {
         if(is ByteBufferImpl buffer){
-            return channel.write(buffer.buf);
+            return channel.write(buffer.underlyingBuffer);
         }
         throw;
+    }
+    
+    shared actual void setNonBlocking() {
+        channel.configureBlocking(false);
     }
 }
